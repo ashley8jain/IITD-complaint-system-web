@@ -83,7 +83,7 @@ def call():
 
 @auth.requires_login()
 def home():
-    complaints = db.complaint.select(orderby=~db.complaint.created_at,limitby=(0,100))
+    complaints = db(db.complaint).select(orderby=~db.complaint.created_at,limitby=(0,100))
     return locals()
 
 def name_of(user_id):
@@ -91,4 +91,5 @@ def name_of(user_id):
     myset = db(myquery);
     rows = myset.select();
     for row in rows:
-        return (row.first_name + row.last_name);
+        user = row;
+    return (user.first_name + user.last_name);

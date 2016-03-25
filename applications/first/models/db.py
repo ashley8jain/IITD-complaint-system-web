@@ -144,3 +144,13 @@ db.define_table(
     Field('created_at','datetime', default=datetime.now),
     Field('description','string'),
 )
+
+db.define_table(
+    'threads',
+    Field('username', db.users),
+    Field('complaint_id', db.complaint),
+    Field('created_at', 'datetime', default=datetime.now),
+    Field('updated_at', 'datetime', default=datetime.now),
+    Field('title','string'),
+    Field('description', 'string'),
+)

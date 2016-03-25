@@ -91,4 +91,18 @@ def name_of(user_id):
     myset = db(myquery);
     rows = myset.select();
     for row in rows:
-        return (row.first_name + row.last_name);
+        user = row;
+    return (user.first_name + user.last_name);
+
+def spec_comlpaint():
+	if len(request.args)<1:
+		raise HTTP(404)
+	try:
+		aid = request.args[0]
+	except Exception, e:
+		raise HTTP(404)
+	complaint = db(db.complaint.id==aid).select()
+	if len(complaint)<1:
+		raise HTTP(404)
+	else:
+		complaint = complaint.first()
