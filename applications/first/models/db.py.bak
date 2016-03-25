@@ -141,6 +141,6 @@ db.define_table(
     Field('user_id',db.auth_user),
     Field('title','string'),
     Field('type_','integer'),
-    #Field('created_at','datetime', default=datetime.now),
+    Field('created_at','datetime', default=datetime.now),
     Field('description','string'),
 )

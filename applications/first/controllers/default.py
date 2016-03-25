@@ -8,6 +8,7 @@
 ## - download is for downloading files uploaded in the db (does streaming)
 #########################################################################
 
+@auth.requires_login()
 def index():
     """
     example action using the internationalization operator T and flash
@@ -17,7 +18,15 @@ def index():
     return auth.wiki()
     """
     response.flash = T("Hello World")
-    return dict(message=T('Welcome to web2py! Hello World'))
+    if auth.user:
+        success = True;
+        user = auth.user;
+        current_user_type = auth.user.type_;
+        if(current_user_type==2):
+            redirect(URL('all_records'));
+        else:
+            redirect(URL('home'));
+    return locals();
 
 def first():
     return dict()
@@ -71,3 +80,15 @@ def call():
     supports xml, json, xmlrpc, jsonrpc, amfrpc, rss, csv
     """
     return service()
+
+@auth.requires_login()
+def home():
+    complaints = db(db.complaint).select(orderby=~db.complaint.created_at,limitby=(0,100))
+    return locals()
+
+def name_of(user_id):
+    myquery = (db.users.username == user_id);
+    myset = db(myquery);
+    rows = myset.select();
+    for row in rows:
+        return (row.first_name + row.last_name);
