@@ -143,4 +143,5 @@ db.define_table(
     Field('type_','integer'),
     Field('created_at','datetime', default=datetime.now),
     Field('description','string'),
+    Field('no_of_votes','interger', default=0 ),
 )

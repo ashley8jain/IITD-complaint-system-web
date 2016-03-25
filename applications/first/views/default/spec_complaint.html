@@ -1,0 +1,13 @@
+{{extend 'layout.html'}}
+ {{=H1(complaint.title)}}
+{{=SPAN(XML(complaint.description))}}
+<div class="table-responsive">
+	<table class="table table-striped">
+		<tbody>
+            <tr><td>{{=B("Created At")}}</td><td>{{=complaint.created_at}}</td></tr>
+            <tr><td>{{=B("Type")}}</td><td>{{=complaint.type_}}</td></tr>
+            <tr><td>{{=B("Created By")}}</td><td>{{=complaint.user_id}}</td></tr>
+            <tr><td>{{=B("No of Votes")}}</td><td>{{=complaint.no_of_votes}}</td></tr>
+	    </tbody>
+	</table>
+</div>

@@ -11,7 +11,7 @@
 <script>$('textarea').css('width','600px').css('height','50px');</script>
 {{for complaint in complaints:}}
 <div style="background: #f0f0f0; margin-bottom: 5px; padding: 8px;">
-<h3>{{=name_of(complaint.user_id)}} on {{=complaint.created_at}}:</h3>
+<h3><a href="{{=URL('spec_complaint',args=[complaint.id])}}"> {{=name_of(complaint.user_id)}} on {{=complaint.created_at}}: </a> </h3>
 {{=MARKMIN(complaint.description)}}
 </div>
 {{pass}}
