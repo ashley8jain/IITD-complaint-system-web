@@ -5,7 +5,38 @@
 	<table class="table table-striped">
 		<tbody>
             <tr><td>{{=B("Created At")}}</td><td>{{=complaint.created_at}}</td></tr>
+            <tr><td>{{=B("Type")}}</td><td>{{=complaint.type_}}</td></tr>
             <tr><td>{{=B("Created By")}}</td><td>{{=complaint.user_id}}</td></tr>
+            <tr><td>{{=B("No of Votes")}}</td><td>{{=complaint.no_of_votes}}</td></tr>
 	    </tbody>
 	</table>
 </div>
+        <div class="panel-google-plus-textarea">
+	            <textarea id="comment_text" rows="4"></textarea>
+	            <button type="submit" onclick="post_comment();" class="[ btn]">Post comment</button>
+	    </div>
+<script type="text/javascript">
+var complaint_id ={{=complaint.id}};
+    function post_comment(){
+        $.ajax({
+            url:"/first/default/post_comment.json?complaint_id="+complaint_id+"&description="+$('#comment_text').val(),
+            success: function(result){
+                alert("sucess")
+            }
+        });
+    }
+
+</script>
+<!-- {{def name_of(user_id):}}
+    {{row = db(db.users.id == user_id).select().first();}}
+    {{name = row.first_name}}
+    {{if row.last_name: name = name +" "+row.last_name}}
+    {{return name;}}
+{{pass}}
+{{pass}} -->
+{{for comment in comments:}}
+<div style="background: #f0f0f0; margin-bottom: 5px; padding: 8px;">
+<h4> {{=(comment.description)}}</h4>
+</div>
+
+{{pass}}

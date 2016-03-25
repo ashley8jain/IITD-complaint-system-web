@@ -105,4 +105,12 @@ def spec_complaint():
         raise HTTP(404)
     else:
         complaint = complaint.first()
-    return dict(form = complaint);
+        comments = db(db.comments).select();
+    return locals();
+
+@auth.requires_login()
+def post_comment():
+    complaint_id = int(request.vars["complaint_id"])
+    description = str(request.vars["description"]).strip()	
+    comment_id = db.comments.insert(complaint_id=complaint_id, user_id=auth.user.id, description=description)
+    return dict(success=True,comments_id=comment_id)

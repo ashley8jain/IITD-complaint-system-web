@@ -145,3 +145,11 @@ db.define_table(
     Field('description','string'),
    Field('no_of_votes','integer', default=0 ),
 )
+
+db.define_table(
+    'comments',
+    Field('complaint_id',db.complaint),
+    Field('user_id',db.auth_user),
+    Field('description','string'),
+    Field('created_at','datetime', default=datetime.now),
+)
