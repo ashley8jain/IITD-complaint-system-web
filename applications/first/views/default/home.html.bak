@@ -8,7 +8,7 @@
 function post_new_complaint(){
     if ($('#new_complaint_description').val().trim()!='' && $('#new_complaint_title').val().trim()!=''){
         $.ajax({
-            url:'/first/complaint/new.json?title='+$('#new_complaint_title').val()+"&description="+$('#new_complaint_description').val(),
+            url:"/first/complaint/new.json?title="+$('#new_complaint_title').val()+"&description="+$('#new_complaint_description').val(),
 			success:function(data){
                 location.href=location.href;
 			},
@@ -19,16 +19,15 @@ function post_new_complaint(){
 	}
 }
 </script>
-{{#=form}}
+
 {{def name_of(user_id):}}
-    {{myquery = (db.users.username == user_id);}}
-    {{myset = db(myquery);}}
-    {{rows = myset.select();}}
-    {{for row in rows:}}
-        {{return (row.first_name + row.last_name);}}
+    {{row = db(db.users.id == user_id).select().first();}}
+    {{name = row.first_name}}
+    {{if row.last_name: name = name +" "+row.last_name}}
+    {{return name;}}
 {{pass}}
 {{pass}}
-<script>$('textarea').css('width','600px').css('height','50px');</script>
+
 {{for complaint in complaints:}}
 <div style="background: #f0f0f0; margin-bottom: 5px; padding: 8px;">
 <h3><a href="{{=URL('spec_complaint',args=[complaint.id])}}"> {{=name_of(complaint.user_id)}} on {{=complaint.created_at}}: </a> </h3>
