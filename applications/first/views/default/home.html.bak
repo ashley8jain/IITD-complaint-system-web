@@ -1,4 +1,24 @@
 {{extend 'layout.html'}}
+<h1>Creating Complaint</h1>
+<input class="form-control" id="new_complaint_title" type="text" placeholder="Title" tabindex="1">
+			<textarea class="form-control" id="new_complaint_description" rows=4 placeholder="Description" tabindex="2"></textarea>
+			<button class="btn btn-primary" onclick="post_new_complaint();" tabindex="3">Submit</button>
+
+<script type="text/javascript">
+function post_new_complaint(){
+    if ($('#new_complaint_description').val().trim()!='' && $('#new_complaint_title').val().trim()!=''){
+        $.ajax({
+            url:'/first/complaint/new.json?title='+$('#new_complaint_title').val()+"&description="+$('#new_complaint_description').val(),
+			success:function(data){
+                location.href=location.href;
+			},
+			error:function(){
+                alert("Couldn't post new complaint.");
+			}
+		});
+	}
+}
+</script>
 {{#=form}}
 {{def name_of(user_id):}}
     {{myquery = (db.users.username == user_id);}}
@@ -11,7 +31,8 @@
 <script>$('textarea').css('width','600px').css('height','50px');</script>
 {{for complaint in complaints:}}
 <div style="background: #f0f0f0; margin-bottom: 5px; padding: 8px;">
-<h3><a href="http://www.google.com/"> {{=name_of(complaint.user_id)}} on {{=complaint.created_at}}: </a> </h3>
+<h3><a href="{{=URL('spec_complaint',args=[complaint.id])}}"> {{=name_of(complaint.user_id)}} on {{=complaint.created_at}}: </a> </h3>
 {{=MARKMIN(complaint.description)}}
 </div>
+
 {{pass}}
