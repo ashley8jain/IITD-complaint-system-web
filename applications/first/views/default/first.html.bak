@@ -1,0 +1,6 @@
+{{extend 'layout.html'}}
+<h1>What is your name?</h1>
+<form action="{{=URL('second')}}">
+  <input name="visitor_name" />
+  <input type="submit" />
+</form>

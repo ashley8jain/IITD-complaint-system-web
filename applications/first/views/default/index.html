@@ -1,0 +1,34 @@
+{{#left_sidebar_enabled,right_sidebar_enabled=False,('message' in globals())}}
+{{extend 'layout.html'}}
+
+{{if auth.is_logged_in():}}
+    <h1 class="page-header">Dashboard</h1>
+    <header class="container-fluid background">
+      <div class="jumbotron text-center">
+        {{if response.title:}}
+        <h1>{{=response.title}}
+          <small>{{=response.subtitle or ''}}</small></h1>
+        {{pass}}
+      </div>
+    </header>
+
+{{else:}}
+  {{block header}}
+  {{end}}
+
+  <div class="jumbotron">
+  <h1>Institute Level Complaint Management System</h1>
+  <h2>IIT Delhi</h2>
+  <h3>Web2py</h3><br><br>
+
+  <span><strong>Created By:</strong></span><br>
+  <span>Ashley jain (2012CSZ8280)</span><br>
+  <span>Chandu Dasari (2011CS50271)</span><br>
+  <span>Saurabh Sreevastava (2014MCS2803)</span><br><br>
+
+  <p><a class="btn btn-primary btn-lg" href="/first/default/user/login" role="button">Login</a>
+  <a class="btn btn-default btn-lg" href="/first/default/user/register" role="button">Sign Up</a></p>
+</div>
+<div>
+</div>
+{{pass}}
