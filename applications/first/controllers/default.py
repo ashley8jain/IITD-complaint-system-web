@@ -74,7 +74,7 @@ def download():
 def login():
     userid = request.vars.userid
     password = request.vars.password
-    user = auth.q(userid,password)
+    user = auth.login_bare(userid,password)
     return dict(success=False if not user else True, user=user)
 
 def logout():
@@ -161,8 +161,8 @@ def update_complaint():
 @auth.requires_login()
 def delete_complaint():
         complaint_id = int(request.vars["complaint_id"])
-        complaint = db(db.complaint.id==complaint_id).select()
-        if (db.complaint.user_id == auth.user.id):
+        complaint = db(db.complaint.id==complaint_id).select().first()
+        if (complaint.user_id == auth.user.id):
             db(db.complaint.id==complaint_id).delete()
             return dict(success=True)
         else:
