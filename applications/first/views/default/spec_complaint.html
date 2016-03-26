@@ -1,6 +1,14 @@
 {{extend 'layout.html'}}
  {{=H1(complaint.title)}}
 {{=SPAN(XML(complaint.description))}}
+<div class="panel-google-plus-textarea">
+                 <b>Title       </b>
+	            <textarea id="title" rows="1" >{{=(complaint.title)}}</textarea><br>
+                 <b>Description  </b>
+                 <textarea id="description" rows="4" >{{=(complaint.description)}}</textarea><br>
+	            <button type="submit" onclick="update_complaint();" class="[ btn]">Update Complaint</button>
+                <button type="submit" onclick="delete_complaint();" class="[ btn]">Delete Complaint</button>
+	         </div>
 <div class="table-responsive">
 	<table class="table table-striped">
 		<tbody>
@@ -25,21 +33,45 @@ var complaint_id ={{=complaint.id}};
             }
         });
     }
+    function update_complaint(){
+        $.ajax({
+            url:"/first/default/update_complaint.json?complaint_id="+complaint_id+"&description="+$('#description').val()+"&title="+$('#title').val(),
+            success: function(result){
+                 location.href=location.href;
+            }
+        });
+    }
+     function delete_complaint(){
+        $.ajax({
+            url:"/first/default/delete_complaint.json?complaint_id="+complaint_id,
+            success: function(result){
+                 location.href='/first/default/home';
+            }
+        });
+    }
+    function delete_comment(comment_id){
+        $.ajax({
+            url:"/first/default/delete_comment.json?comment_id="+comment_id,
+            success: function(result){
+                 location.href=location.href;
+            }
+        });
+    }
 
 </script>
 
 
-{{def name_of(user_id):}}
+<!-- {{def name_of(user_id):}}
     {{row = db(db.users.id == user_id).select().first();}}
     {{name = row.first_name}}
     {{if row.last_name: name = name +" "+row.last_name}}
     {{return name;}}
 {{pass}}
-{{pass}}
+{{pass}} -->
 {{for comment in comments:}}
 <div style="background: #f0f0f0; margin-bottom: 5px; padding: 8px;">
 <h4> {{=(comment.description)}}</h4>
-    <h5> {{=name_of(comment.user_id)}} </h5>
-    <h6>on {{=comment.created_at}} </h6>
+    {{comment_id = comment.id}}
+<button type="submit" onclick="delete_comment({{=comment.id}})"  class="[ btn]">Delete Comment</button>
 </div>
 {{pass}}

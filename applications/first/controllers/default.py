@@ -149,3 +149,31 @@ def getHostelMates(hostel_name):
     for row in rows:
         my_hostel_mates.append(row.id);
     return my_hostel_mates;
+
+@auth.requires_login()
+def update_complaint():
+    complaint_id = int(request.vars["complaint_id"])
+    description = str(request.vars["description"]).strip()
+    title = str(request.vars["title"]).strip()
+    db(db.complaint.id==complaint_id).update(description = description , title = title)
+    return dict(success=True)
+
+@auth.requires_login()
+def delete_complaint():
+        complaint_id = int(request.vars["complaint_id"])
+        complaint = db(db.complaint.id==complaint_id).select()
+        if (db.complaint.user_id == auth.user.id):
+            db(db.complaint.id==complaint_id).delete()
+            return dict(success=True)
+        else:
+            return dict(success=False)
+
+@auth.requires_login()
+def delete_comment():
+        comment_id = int(request.vars["comment_id"])
+        comment = db(db.comments.id==comment_id).select().first()
+        if (comment.user_id == auth.user.id):
+            db(db.comments.id==comment_id).delete()
+            return dict(success=True)
+        else:
+            return dict(success=False)

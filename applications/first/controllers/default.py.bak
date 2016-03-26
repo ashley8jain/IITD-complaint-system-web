@@ -142,3 +142,10 @@ def post_comment():
     for user in users:
         db.notifications.insert(user_id=user, description="new <a href='/first/default/spec_complaint/%s'>comment</a> posted"%(complaint_id))
     return dict(success=True,comments_id=comment_id)
+
+def getHostelMates(hostel_name):
+    my_hostel_mates = [];
+    rows = db(db.users.hostel_name == hostel_name).select();
+    for row in rows:
+        my_hostel_mates.append(row.id);
+    return my_hostel_mates;
