@@ -74,7 +74,7 @@ def download():
 def login():
     userid = request.vars.userid
     password = request.vars.password
-    user = auth.q(userid,password)
+    user = auth.login_bare(userid,password)
     return dict(success=False if not user else True, user=user)
 
 def logout():
@@ -90,10 +90,25 @@ def call():
     """
     return service()
 
+def getHostelComplaints(hostel_name):
+    me_and_my_hostelmates = [];
+    rows = db(db.users.hostel_name == hostel_name).select();
+    for row in rows:
+        me_and_my_hostelmates.append(row.id);
+    my_hostel_complaints = db(db.complaint.user_id.belongs(me_and_my_hostelmates)).select();#orderby=~db.complaint.created_at,limitby=(0,100));
+    return my_hostel_complaints;
+
 @auth.requires_login()
 def home():
-    complaints = db(db.complaint).select(orderby=~db.complaint.created_at,limitby=(0,100))
+    userId = auth.user.id;
+    hostelName = db(db.users.id==userId).select().first().hostel_name;
+    my_hostel_complaints = getHostelComplaints(hostelName)#db(db.complaint).select(orderby=~db.complaint.created_at,limitby=(0,100))
     return locals()
+
+def notification():
+    noti = db(db.notifications.user_id==auth.user.id).select(orderby=~db.notifications.created_at)
+    db(db.notifications.user_id==auth.user.id).update(is_seen=1)
+    return dict(notifications=noti)
 
 def name_of(user_id):
     myquery = (db.users.username == user_id);
@@ -120,6 +135,45 @@ def spec_complaint():
 @auth.requires_login()
 def post_comment():
     complaint_id = int(request.vars["complaint_id"])
-    description = str(request.vars["description"]).strip()	
+    description = str(request.vars["description"]).strip()
     comment_id = db.comments.insert(complaint_id=complaint_id, user_id=auth.user.id, description=description)
+    hostelName = db(db.users.id==auth.user.id).select().first().hostel_name
+    users = getHostelMates(hostelName)
+    for user in users:
+        db.notifications.insert(user_id=user, description="new <a href='/first/default/spec_complaint/%s'>comment</a> posted"%(complaint_id))
     return dict(success=True,comments_id=comment_id)
+
+def getHostelMates(hostel_name):
+    my_hostel_mates = [];
+    rows = db(db.users.hostel_name == hostel_name).select();
+    for row in rows:
+        my_hostel_mates.append(row.id);
+    return my_hostel_mates;
+
+@auth.requires_login()
+def update_complaint():
+    complaint_id = int(request.vars["complaint_id"])
+    description = str(request.vars["description"]).strip()
+    title = str(request.vars["title"]).strip()
+    db(db.complaint.id==complaint_id).update(description = description , title = title)
+    return dict(success=True)
+
+@auth.requires_login()
+def delete_complaint():
+        complaint_id = int(request.vars["complaint_id"])
+        complaint = db(db.complaint.id==complaint_id).select().first()
+        if (complaint.user_id == auth.user.id):
+            db(db.complaint.id==complaint_id).delete()
+            return dict(success=True)
+        else:
+            return dict(success=False)
+
+@auth.requires_login()
+def delete_comment():
+        comment_id = int(request.vars["comment_id"])
+        comment = db(db.comments.id==comment_id).select().first()
+        if (comment.user_id == auth.user.id):
+            db(db.comments.id==comment_id).delete()
+            return dict(success=True)
+        else:
+            return dict(success=False)

@@ -140,7 +140,8 @@ db.define_table(
     'complaint',
     Field('user_id',db.users),
     Field('title','string'),
-    Field('type_','integer'),
+    Field('type_','integer',default=2),
+    Field('department','integer',default=1),
     Field('created_at','datetime', default=datetime.now),
     Field('description','string'),
    Field('no_of_votes','integer', default=0 ),
@@ -160,4 +161,11 @@ db.define_table(
     Field('description', 'string'),
     Field('is_seen', 'integer', default=0),
     Field('created_at', 'datetime', default=datetime.now),
+)
+
+db.define_table(
+    'votes',
+    Field('user_id', db.users),
+    Field('complaint_id', db.complaint),
+    Field('upvote','integer', default=0),
 )

@@ -90,19 +90,32 @@ def call():
     """
     return service()
 
-def getHostelComplaints(hostel_name):
+def getHostelComplaints(hostel_name, level):
     me_and_my_hostelmates = [];
     rows = db(db.users.hostel_name == hostel_name).select();
     for row in rows:
         me_and_my_hostelmates.append(row.id);
-    my_hostel_complaints = db(db.complaint.user_id.belongs(me_and_my_hostelmates)).select();#orderby=~db.complaint.created_at,limitby=(0,100));
+    if level==2:
+        my_hostel_complaints = db(db.complaint.user_id.belongs(me_and_my_hostelmates)&(db.complaint.type_==level)).select(orderby=~db.complaint.created_at,limitby=(0,100));
+    elif level==3:
+        my_hostel_complaints = db(db.complaint.type_==level).select(orderby=~db.complaint.created_at,limitby=(0,100));
+    elif level==1:
+        my_hostel_complaints = db((db.complaint.user_id==auth.user.id)&(db.complaint.type_==level)).select(orderby=~db.complaint.created_at,limitby=(0,100));
+    else:
+        my_hostel_complaints = db(db.complaint.user_id.belongs(me_and_my_hostelmates)).select(orderby=~db.complaint.created_at,limitby=(0,100));
     return my_hostel_complaints;
+
 
 @auth.requires_login()
 def home():
     userId = auth.user.id;
     hostelName = db(db.users.id==userId).select().first().hostel_name;
-    my_hostel_complaints = getHostelComplaints(hostelName)#db(db.complaint).select(orderby=~db.complaint.created_at,limitby=(0,100))
+    level = str(request.vars["level"]).strip();
+    if level!='None':
+        level = int(level);
+    else:
+        level = 2;
+    my_hostel_complaints = getHostelComplaints(hostelName,level)#db(db.complaint).select(orderby=~db.complaint.created_at,limitby=(0,100))
     return locals()
 
 def notification():

@@ -1,24 +1,50 @@
 {{extend 'layout.html'}}
-<h3><a href='/first/default/notification.html'>Notifications</a></h3>
-<h1>Creating Complaint</h1>
-<input class="form-control" id="new_complaint_title" type="text" placeholder="Title" tabindex="1">
-			<textarea class="form-control" id="new_complaint_description" rows=4 placeholder="Description" tabindex="2"></textarea>
-			<button class="btn btn-primary" onclick="post_new_complaint();" tabindex="3">Submit</button>
+
+<div class="create_complaint" style="background: #f0f0f0; padding: 10px;">
+    <h4>Create Complaint:</h4>
+    <input class="form-control" id="new_complaint_title" type="text" placeholder="Title" tabindex="1">
+    <textarea class="form-control" id="new_complaint_description" rows=4 placeholder="Description" tabindex="2"></textarea>
+    <form id="comp_level">
+        <input type="radio" name="complaint_level" value="1" checked> Individual Level
+        <input type="radio" name="complaint_level" value="2"> Hostel Level
+        <input type="radio" name="complaint_level" value="3"> Institute Level
+    </form>
+    <button class="gen_button" onclick="post_new_complaint();" tabindex="3">Submit</button>
+</div>
 
 <script type="text/javascript">
-function post_new_complaint(){
-    if ($('#new_complaint_description').val().trim()!='' && $('#new_complaint_title').val().trim()!=''){
-        $.ajax({
-            url:"/first/complaint/new.json?title="+$('#new_complaint_title').val()+"&description="+$('#new_complaint_description').val(),
-			success:function(data){
-                location.href=location.href;
-			},
-			error:function(){
-                alert("Couldn't post new complaint.");
-			}
-		});
-	}
-}
+
+    function post_new_complaint(){
+        if ($('#new_complaint_description').val().trim()!='' && $('#new_complaint_title').val().trim()!=''){
+            $.ajax({
+                url:"/first/complaint/new.json?title="+$('#new_complaint_title').val()+"&description="+$('#new_complaint_description').val()+"&level="+$('input[name=complaint_level]:checked').val(),
+                success:function(data){
+                    location.href=location.href;
+                },
+                error:function(){
+                    alert("Couldn't post new complaint.");
+                }
+            });
+        }
+    }
+
+    function filter_complaints(){
+        window.location.href = "/first/default/home?level="+$('input[name=display_complaint_level]:checked').val();
+    }
+
+    function upvote(comp_id){
+        $.ajax({url:"/first/complaint/upvote?type=1&complaint_id="+comp_id,
+                success: function(){alert("upvote success");},
+                error: function(){alert("failed to vote "+comp_id);}
+               });
+    }
+
+    function downvote(comp_id){
+        $.ajax({url:"/first/complaint/upvote?type=-1&complaint_id="+comp_id,
+                success: function(){alert("downvote success");},
+                error: function(){alert("failed to vote");}
+               });
+    }
 </script>
 
 {{def name_of(user_id):}}
@@ -28,11 +54,26 @@ function post_new_complaint(){
     {{return name;}}
 {{pass}}
 {{pass}}
+<hr>
+<hr>
 
+<div id="filters_div" style="margin-bottom: 5px;">
+    Filter By:
+    <form id="display_comp_level">
+        <input type="radio" name="display_complaint_level" value="1"> Individual Level
+        <input type="radio" name="display_complaint_level" value="2" checked> Hostel Level
+        <input type="radio" name="display_complaint_level" value="3"> Institute Level
+    </form>
+    <button class="gen_button" onclick="filter_complaints();" tabindex="3"> Apply </button>
+</div>
+
+<hr>
 {{for complaint in my_hostel_complaints:}}
-<div style="background: #f0f0f0; margin-bottom: 5px; padding: 8px;">
-<h3><a href="{{=URL('spec_complaint',args=[complaint.id])}}"> {{=name_of(complaint.user_id)}} on {{=complaint.created_at}}: </a> </h3>
-{{=MARKMIN(complaint.description)}}
+<div id="complaint_div" style="background: #f0f0f0; padding = 10px; margin-bottom: 5px;">
+    <h3><a href="{{=URL('spec_complaint',args=[complaint.id])}}"> {{=complaint.title}}</a> </h3>
+    <button class="updownvote" id="upvote" onclick="upvote('{{=str(complaint.id)}}');"> +1 </button>
+    <button class="updownvote" id="downvote" onclick="downvote('{{=str(complaint.id)}}');"> -1 </button>
+    {{=name_of(complaint.user_id)}} on {{=complaint.created_at}}
 </div>
 
 {{pass}}
