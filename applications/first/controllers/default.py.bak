@@ -71,6 +71,12 @@ def download():
     """
     return response.download(request, db)
 
+def login():
+    userid = request.vars.userid
+    password = request.vars.password
+    user = auth.login_bare(userid,password)
+    return dict(success=False if not user else True, user=user)
+
 
 def call():
     """
@@ -105,7 +111,7 @@ def spec_complaint():
         raise HTTP(404)
     else:
         complaint = complaint.first()
-        comments = db(db.comments).select();
+        comments = db(db.comments.complaint_id == complaint.id).select();
     return locals();
 
 @auth.requires_login()

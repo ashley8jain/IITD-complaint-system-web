@@ -71,6 +71,15 @@ def download():
     """
     return response.download(request, db)
 
+def login():
+    userid = request.vars.userid
+    password = request.vars.password
+    user = auth.q(userid,password)
+    return dict(success=False if not user else True, user=user)
+
+def logout():
+    return dict(success=True, loggedout=auth.logout())
+
 
 def call():
     """
