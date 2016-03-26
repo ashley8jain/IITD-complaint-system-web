@@ -135,6 +135,17 @@ def spec_complaint():
 @auth.requires_login()
 def post_comment():
     complaint_id = int(request.vars["complaint_id"])
-    description = str(request.vars["description"]).strip()	
+    description = str(request.vars["description"]).strip()
     comment_id = db.comments.insert(complaint_id=complaint_id, user_id=auth.user.id, description=description)
+    hostelName = db(db.users.id==auth.user.id).select().first().hostel_name
+    users = getHostelMates(hostelName)
+    for user in users:
+        db.notifications.insert(user_id=user, description="new <a href='/first/default/spec_complaint/%s'>comment</a> posted"%(complaint_id))
     return dict(success=True,comments_id=comment_id)
+
+def getHostelMates(hostel_name):
+    my_hostel_mates = [];
+    rows = db(db.users.hostel_name == hostel_name).select();
+    for row in rows:
+        my_hostel_mates.append(row.id);
+    return my_hostel_mates;
