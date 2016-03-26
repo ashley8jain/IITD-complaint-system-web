@@ -1,4 +1,5 @@
 {{extend 'layout.html'}}
+<h3><a href='/first/default/notification.html'>Notifications</a></h3>
 <h1>Creating Complaint</h1>
 <input class="form-control" id="new_complaint_title" type="text" placeholder="Title" tabindex="1">
 			<textarea class="form-control" id="new_complaint_description" rows=4 placeholder="Description" tabindex="2"></textarea>
@@ -28,7 +29,7 @@ function post_new_complaint(){
 {{pass}}
 {{pass}}
 
-{{for complaint in complaints:}}
+{{for complaint in my_hostel_complaints:}}
 <div style="background: #f0f0f0; margin-bottom: 5px; padding: 8px;">
 <h3><a href="{{=URL('spec_complaint',args=[complaint.id])}}"> {{=name_of(complaint.user_id)}} on {{=complaint.created_at}}: </a> </h3>
 {{=MARKMIN(complaint.description)}}

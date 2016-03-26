@@ -105,6 +105,11 @@ def home():
     my_hostel_complaints = getHostelComplaints(hostelName)#db(db.complaint).select(orderby=~db.complaint.created_at,limitby=(0,100))
     return locals()
 
+def notification():
+    noti = db(db.notifications.user_id==auth.user.id).select(orderby=~db.notifications.created_at)
+    db(db.notifications.user_id==auth.user.id).update(is_seen=1)
+    return dict(notifications=noti)
+
 def name_of(user_id):
     myquery = (db.users.username == user_id);
     myset = db(myquery);

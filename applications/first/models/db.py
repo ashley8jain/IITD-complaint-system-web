@@ -153,3 +153,11 @@ db.define_table(
     Field('description','string'),
     Field('created_at','datetime', default=datetime.now),
 )
+
+db.define_table(
+    'notifications',
+    Field('user_id', db.users),
+    Field('description', 'string'),
+    Field('is_seen', 'integer', default=0),
+    Field('created_at', 'datetime', default=datetime.now),
+)

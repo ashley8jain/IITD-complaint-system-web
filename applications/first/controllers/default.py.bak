@@ -74,8 +74,11 @@ def download():
 def login():
     userid = request.vars.userid
     password = request.vars.password
-    user = auth.login_bare(userid,password)
+    user = auth.q(userid,password)
     return dict(success=False if not user else True, user=user)
+
+def logout():
+    return dict(success=True, loggedout=auth.logout())
 
 
 def call():
@@ -87,10 +90,25 @@ def call():
     """
     return service()
 
+def getHostelComplaints(hostel_name):
+    me_and_my_hostelmates = [];
+    rows = db(db.users.hostel_name == hostel_name).select();
+    for row in rows:
+        me_and_my_hostelmates.append(row.id);
+    my_hostel_complaints = db(db.complaint.user_id.belongs(me_and_my_hostelmates)).select();#orderby=~db.complaint.created_at,limitby=(0,100));
+    return my_hostel_complaints;
+
 @auth.requires_login()
 def home():
-    complaints = db(db.complaint).select(orderby=~db.complaint.created_at,limitby=(0,100))
+    userId = auth.user.id;
+    hostelName = db(db.users.id==userId).select().first().hostel_name;
+    my_hostel_complaints = getHostelComplaints(hostelName)#db(db.complaint).select(orderby=~db.complaint.created_at,limitby=(0,100))
     return locals()
+
+def notification():
+    noti = db(db.notifications.user_id==auth.user.id).select(orderby=~db.notifications.created_at)
+    db(db.notifications.user_id==auth.user.id).update(is_seen=1)
+    return dict(notifications=noti)
 
 def name_of(user_id):
     myquery = (db.users.username == user_id);
