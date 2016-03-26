@@ -149,7 +149,7 @@ db.define_table(
 db.define_table(
     'comments',
     Field('complaint_id',db.complaint),
-    Field('user_id',db.users),
+    Field('user_id',db.auth_user),
     Field('description','string'),
     Field('created_at','datetime', default=datetime.now),
 )

@@ -3,7 +3,6 @@
 *.pid
 applications/admin/errors/
 applications/admin/sessions/
-applications/first/databases/
 applications/first/sessions/
 applications/first/errors/
 applications/first/controllers/progress.log
