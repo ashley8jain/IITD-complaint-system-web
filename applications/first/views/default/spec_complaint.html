@@ -27,15 +27,19 @@ var complaint_id ={{=complaint.id}};
     }
 
 </script>
-<!-- {{def name_of(user_id):}}
+
+
+{{def name_of(user_id):}}
     {{row = db(db.users.id == user_id).select().first();}}
     {{name = row.first_name}}
     {{if row.last_name: name = name +" "+row.last_name}}
     {{return name;}}
 {{pass}}
-{{pass}} -->
+{{pass}}
 {{for comment in comments:}}
 <div style="background: #f0f0f0; margin-bottom: 5px; padding: 8px;">
 <h4> {{=(comment.description)}}</h4>
+    <h5> {{=name_of(comment.user_id)}} </h5>
+    <h6>on {{=comment.created_at}} </h6>
 </div>
 {{pass}}
