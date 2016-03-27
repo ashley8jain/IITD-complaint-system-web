@@ -3,7 +3,7 @@
 <h1 style="margin-left:30px;margin-bottom:50px;">{{=(complaint.title)}}</h1>
 <p style="margin-left:30px;"> {{=SPAN(XML(complaint.description))}} </p>
 {{posted_by = complaint.user_id}}
-{{if (auth.user.id==posted_by):}}<button style="float:right;margin-right:700px;"><a href="{{=URL('first','complaint','edit_complaint', vars=dict(complaint_id=str(complaint.id)))}}">Edit</a></button>
+{{if (auth.user.id==posted_by):}}<button style="float:right;margin-right:700px;height:40px;"><a href="{{=URL('first','complaint','edit_complaint', vars=dict(complaint_id=str(complaint.id)))}}">Edit</a></button>
 {{else:}}
 {{pass}}
 </br>

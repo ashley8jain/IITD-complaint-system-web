@@ -5,28 +5,31 @@
 	<textarea id="title" rows="1" >{{=(complaint.title)}}</textarea></br>
     <b>Description</b> </br>
     <textarea id="description" rows="4" >{{=(complaint.description)}}</textarea></br>
-	<button type="submit" onclick="update_complaint({{=(complaint.id)}});" class="[ btn]">Update Complaint</button>
-    <button type="submit" onclick="delete_complaint({{=(complaint.id)}});" class="[ btn]">Delete Complaint</button>
+	<button type="submit" onclick="update_complaint();" class="[ btn]">Update Complaint</button>
+    <button type="submit" onclick="delete_complaint();" class="[ btn]">Delete Complaint</button>
 </div>
-<script>
-	function update_complaint(comp_id){
+<script type="text/javascript">
+    var complaint_id = {{=complaint.id}};
+	function update_complaint(){
         $.ajax({
-			url:"/first/complaint/update_complaint?complaint_id="+comp_id+"&description="+$('#description').val()+"&title="+$('#title').val(),
-			success: function(result){
-                alert("func call");
-			}
-            error: function(){
+			url:"/first/complaint/update_complaint?complaint_id="+complaint_id+"&description="+$('#description').val()+"&title="+$('#title').val(),
+			success:function(result){
+                location.href="/first/default/spec_complaint/"+complaint_id;
+			},
+            error:function(){
 				alert("fail");
 			}
 		});
-	}
-	function delete_complaint(comp_id){
-        alert("delete call");
+	};
+	function delete_complaint(){
 		$.ajax({
-			url:"/first/complaint/delete_complaint?complaint_id="+comp_id,
+			url:"/first/complaint/delete_complaint?complaint_id="+complaint_id,
 			success: function(result){
-				location.href='/first/default/home';
+				location.href="/first/default/home";
+			},
+            error:function(){
+				alert("fail");
 			}
 		});
-	}
+	};
 </script>
