@@ -90,17 +90,26 @@ def call():
     """
     return service()
 
-def getHostelComplaints(hostel_name, level):
+def getComplaints(hostel_name, level, dept):
     me_and_my_hostelmates = [];
     rows = db(db.users.hostel_name == hostel_name).select();
     for row in rows:
         me_and_my_hostelmates.append(row.id);
     if level==2:
-        my_hostel_complaints = db(db.complaint.user_id.belongs(me_and_my_hostelmates)&(db.complaint.type_==level)).select(orderby=~db.complaint.created_at,limitby=(0,100));
+        level_query = (db.complaint.user_id.belongs(me_and_my_hostelmates)&(db.complaint.type_==level)); #just defining the level-wise "query"
     elif level==3:
-        my_hostel_complaints = db(db.complaint.type_==level).select(orderby=~db.complaint.created_at,limitby=(0,100));
+        level_query = (db.complaint.type_==level);
+    elif level==1:
+        level_query = ((db.complaint.user_id==auth.user.id)&(db.complaint.type_==level));
     else:
-        my_hostel_complaints = db(db.complaint.user_id.belongs(me_and_my_hostelmates)).select(orderby=~db.complaint.created_at,limitby=(0,100));
+        level_query = (db.complaint.user_id.belongs(me_and_my_hostelmates)); #.select(orderby=~db.complaint.created_at,limitby=(0,100))
+    if dept==0:
+        my_hostel_complaints = db(level_query).select(orderby=~db.complaint.created_at,limitby=(0,100));
+    else:
+        dept_query = (db.complaint.department == dept);
+        my_hostel_complaints = db( level_query & dept_query ).select(orderby=~db.complaint.created_at,limitby=(0,100));
+        #defining dept-wise query,combining with level-wise and performing the query
+
     return my_hostel_complaints;
 
 
@@ -109,24 +118,16 @@ def home():
     userId = auth.user.id;
     hostelName = db(db.users.id==userId).select().first().hostel_name;
     level = str(request.vars["level"]).strip();
-    if level!='None':
-        level = int(level);
-    else:
-        level = 2;
-    my_hostel_complaints = getHostelComplaints(hostelName,level)#db(db.complaint).select(orderby=~db.complaint.created_at,limitby=(0,100))
+    dept = str(request.vars["display_dept"]).strip();
+    level = int(level) if (level!='None') else 0;
+    dept = int(dept) if (dept!='None') else 0;
+    my_hostel_complaints = getComplaints(hostelName,level,dept)
     return locals()
 
 def notification():
     noti = db(db.notifications.user_id==auth.user.id).select(orderby=~db.notifications.created_at)
     db(db.notifications.user_id==auth.user.id).update(is_seen=1)
     return dict(notifications=noti)
-
-def name_of(user_id):
-    myquery = (db.users.username == user_id);
-    myset = db(myquery);
-    rows = myset.select();
-    user = rows.first();
-    return (user.first_name + user.last_name);
 
 def spec_complaint():
     if len(request.args)<1:

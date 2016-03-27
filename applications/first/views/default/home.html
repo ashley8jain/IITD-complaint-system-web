@@ -9,15 +9,26 @@
         <input type="radio" name="complaint_level" value="2"> Hostel Level
         <input type="radio" name="complaint_level" value="3"> Institute Level
     </form>
+    <select id="complaint_dept">
+        <option value="1" selected="selected" >General</option>
+        <option value="2">Maintenance</option>
+        <option value="3">Mess</option>
+        <option value="4">Sports</option>
+        <option value="5">Cultural</option>
+    </select> </br>
     <button class="gen_button" onclick="post_new_complaint();" tabindex="3">Submit</button>
 </div>
 
 <script type="text/javascript">
 
     function post_new_complaint(){
+
+        var e = document.getElementById("complaint_dept");
+        var dept = e.options[e.selectedIndex].value;
+
         if ($('#new_complaint_description').val().trim()!='' && $('#new_complaint_title').val().trim()!=''){
             $.ajax({
-                url:"/first/complaint/new.json?title="+$('#new_complaint_title').val()+"&description="+$('#new_complaint_description').val()+"&level="+$('input[name=complaint_level]:checked').val(),
+                url:"/first/complaint/new.json?title="+$('#new_complaint_title').val()+"&description="+$('#new_complaint_description').val()+"&level="+$('input[name=complaint_level]:checked').val()+"&complaint_dept="+dept,
                 success:function(data){
                     location.href=location.href;
                 },
@@ -29,19 +40,21 @@
     }
 
     function filter_complaints(){
-        window.location.href = "/first/default/home?level="+$('input[name=display_complaint_level]:checked').val();
+        var e = document.getElementById("display_dept");
+        var dept = e.options[e.selectedIndex].value;
+        window.location.href = "/first/default/home?level="+$('input[name=display_complaint_level]:checked').val()+"&display_dept="+dept;
     }
 
     function upvote(comp_id){
         $.ajax({url:"/first/complaint/upvote?type=1&complaint_id="+comp_id,
-                success: function(){alert("upvote success");},
-                error: function(){alert("failed to vote "+comp_id);}
+                success: location.href=location.href,
+                error: function(){alert("failed to vote");}
                });
     }
 
     function downvote(comp_id){
         $.ajax({url:"/first/complaint/upvote?type=-1&complaint_id="+comp_id,
-                success: function(){alert("downvote success");},
+                success: location.href=location.href,
                 error: function(){alert("failed to vote");}
                });
     }
@@ -57,13 +70,25 @@
 <hr>
 <hr>
 
-<div id="filters_div" style="margin-bottom: 5px;">
+<div id="filters_div" style="width:1000px;margin-bottom:5px;">
     Filter By:
     <form id="display_comp_level">
-        <input type="radio" name="display_complaint_level" value="1"> Individual Level
-        <input type="radio" name="display_complaint_level" value="2" checked> Hostel Level
-        <input type="radio" name="display_complaint_level" value="3"> Institute Level
+        <input type="radio" id="display_complaint_level" name="display_complaint_level" value="0" checked> All
+        <input type="radio" id="display_complaint_level" name="display_complaint_level" value="1"> Individual Level
+        <input type="radio" id="display_complaint_level" name="display_complaint_level" value="2"> Hostel Level
+        <input type="radio" id="display_complaint_level" name="display_complaint_level" value="3"> Institute Level
     </form>
+    {{if (auth.user.type_==2):}}<button class="admin_button" id="admin_button"> Admin mode </button>
+    {{else:}}
+    {{pass}}
+    <select id="display_dept">
+        <option value="0" selected="selected"> All</option>
+        <option value="1">General</option>
+        <option value="2">Maintenance</option>
+        <option value="3">Mess</option>
+        <option value="4">Sports</option>
+        <option value="5">Cultural</option>
+    </select>
     <button class="gen_button" onclick="filter_complaints();" tabindex="3"> Apply </button>
 </div>
 
@@ -72,6 +97,7 @@
 <div id="complaint_div" style="background: #f0f0f0; padding = 10px; margin-bottom: 5px;">
     <h3><a href="{{=URL('spec_complaint',args=[complaint.id])}}"> {{=complaint.title}}</a> </h3>
     <button class="updownvote" id="upvote" onclick="upvote('{{=str(complaint.id)}}');"> +1 </button>
+    <p class="updownvote" id="vote_counter"> {{=upvote_count(complaint.id) }} </p> <!--=URL('upvote_count',vars=dict(complaint_id=str(complaint.id)))-->
     <button class="updownvote" id="downvote" onclick="downvote('{{=str(complaint.id)}}');"> -1 </button>
     {{=name_of(complaint.user_id)}} on {{=complaint.created_at}}
 </div>

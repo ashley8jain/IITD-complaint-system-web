@@ -1,7 +1,14 @@
 {{extend 'layout.html'}}
- {{=H1(complaint.title)}}
-{{=SPAN(XML(complaint.description))}}
-<div class="table-responsive">
+
+<h1 style="margin-left:30px;margin-bottom:50px;">{{=(complaint.title)}}</h1>
+<p style="margin-left:30px;"> {{=SPAN(XML(complaint.description))}} </p>
+{{posted_by = complaint.user_id}}
+{{if (auth.user.id==posted_by):}}<button style="float:right;margin-right:700px;"><a href="{{=URL('first','complaint','edit_complaint', vars=dict(complaint_id=str(complaint.id)))}}">Edit</a></button>
+{{else:}}
+{{pass}}
+</br>
+</br>
+<div class="table-responsive" style="width:600px;">
 	<table class="table table-striped">
 		<tbody>
             <tr><td>{{=B("Created At")}}</td><td>{{=complaint.created_at}}</td></tr>
@@ -11,59 +18,47 @@
 	    </tbody>
 	</table>
 </div>
-        <div class="panel-google-plus-textarea">
-	            <textarea id="comment_text" rows="4"></textarea>
-	            <button type="submit" onclick="post_comment();" class="[ btn]">Post comment</button>
-	    </div>
+
+<div class="panel-google-plus-textarea" style="width:600px;">
+    <textarea id="comment_text" rows="4" style="width:600px;"></textarea> </br>
+    <button type="submit" onclick="post_comment();" style="margin-right:200px;">Post comment</button>
+</div>
+
 <script type="text/javascript">
-var complaint_id ={{=complaint.id}};
-    function post_comment(){
-        $.ajax({
-            url:"/first/default/post_comment.json?complaint_id="+complaint_id+"&description="+$('#comment_text').val(),
-            success: function(result){
-                 location.href=location.href;
-            }
-        });
+    var complaint_id ={{=complaint.id}};
+    function edit_complaint(){
+        location.href = "first/complaint/edit_complaint?/complaint_id="+complaint_id;
     }
-    function update_complaint(){
-        $.ajax({
-            url:"/first/default/update_complaint.json?complaint_id="+complaint_id+"&description="+$('#description').val()+"&title="+$('#title').val(),
-            success: function(result){
-                 location.href=location.href;
-            }
-        });
-    }
-     function delete_complaint(){
-        $.ajax({
-            url:"/first/default/delete_complaint.json?complaint_id="+complaint_id,
-            success: function(result){
-                 location.href='/first/default/home';
-            }
-        });
-    }
-    function delete_comment(comment_id){
-        $.ajax({
-            url:"/first/default/delete_comment.json?comment_id="+comment_id,
-            success: function(result){
-                 location.href=location.href;
-            }
-        });
-    }
-
+        function post_comment(){
+            $.ajax({
+                url:"/first/default/post_comment.json?complaint_id="+complaint_id+"&description="+$('#comment_text').val(),
+                success: function(result){
+                     location.href=location.href;
+                }
+            });
+        }
+        function delete_comment(comment_id){
+            $.ajax({
+                url:"/first/default/delete_comment.json?comment_id="+comment_id,
+                success: function(result){
+                     location.href=location.href;
+                }
+            });
+        }
 </script>
-
-
-<!-- {{def name_of(user_id):}}
-    {{row = db(db.users.id == user_id).select().first();}}
-    {{name = row.first_name}}
-    {{if row.last_name: name = name +" "+row.last_name}}
-    {{return name;}}
-{{pass}}
-{{pass}} -->
+<h4 style="margin-left:30px;"> Comments: </h4>
 {{for comment in comments:}}
-<div style="background: #f0f0f0; margin-bottom: 5px; padding: 8px;">
-<h4> {{=(comment.description)}}</h4>
+<div style="width:600px;background:#f0f0f0;margin-bottom: 5px;padding:10px;">
     {{comment_id = comment.id}}
-<button type="submit" onclick="delete_comment({{=comment.id}})"  class="[ btn]">Delete Comment</button>
+    {{posted_user = comment.user_id}}
+    {{user = db(db.users.id==comment.user_id).select().first()}}
+    <div class="comment_side">
+        <h4 style="width:450px;"> {{=(user.first_name + user.last_name)}}</h4>
+        <p style="width:450px;">{{=(comment.description)}} </p>
+    </div>
+    {{if (posted_user==auth.user.id):}}<div class="comment_side"><button type="submit" onclick="delete_comment({{=comment.id}})" style="width:70px; height:40px;float:right">Delete</button> </div>
+    {{else:}}
+    {{pass}}
+    <div class="clearfix"></div>
 </div>
 {{pass}}

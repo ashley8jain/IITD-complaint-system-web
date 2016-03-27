@@ -8,3 +8,13 @@ def upvote():
         db.votes.insert(user_id=auth.user.id, complaint_id=comp_id, upvote=0, downvote=1, no_ud=0);
     else:
         return "bad call to function upvote";
+
+def upvote_count(comp_id):
+    #comp_id = request.vars['complaint_id'];
+    sum = db.votes.upvote.sum();
+    votes = db(db.votes.complaint_id==comp_id).select(sum).first()[sum];
+    if (votes == None):
+        return 0;
+    else:
+        sum_of_votes = int(votes);
+        return sum_of_votes;

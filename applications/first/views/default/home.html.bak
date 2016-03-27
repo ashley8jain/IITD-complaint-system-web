@@ -1,24 +1,63 @@
 {{extend 'layout.html'}}
-<h3><a href='/first/default/notification.html'>Notifications</a></h3>
-<h1>Creating Complaint</h1>
-<input class="form-control" id="new_complaint_title" type="text" placeholder="Title" tabindex="1">
-			<textarea class="form-control" id="new_complaint_description" rows=4 placeholder="Description" tabindex="2"></textarea>
-			<button class="btn btn-primary" onclick="post_new_complaint();" tabindex="3">Submit</button>
+
+<div class="create_complaint" style="background: #f0f0f0; padding: 10px;">
+    <h4>Create Complaint:</h4>
+    <input class="form-control" id="new_complaint_title" type="text" placeholder="Title" tabindex="1">
+    <textarea class="form-control" id="new_complaint_description" rows=4 placeholder="Description" tabindex="2"></textarea>
+    <form id="comp_level">
+        <input type="radio" name="complaint_level" value="1" checked> Individual Level
+        <input type="radio" name="complaint_level" value="2"> Hostel Level
+        <input type="radio" name="complaint_level" value="3"> Institute Level
+    </form>
+    <select id="complaint_dept">
+        <option value="1" selected="selected" >General</option>
+        <option value="2">Maintenance</option>
+        <option value="3">Mess</option>
+        <option value="4">Sports</option>
+        <option value="5">Cultural</option>
+    </select> </br>
+    <button class="gen_button" onclick="post_new_complaint();" tabindex="3">Submit</button>
+</div>
 
 <script type="text/javascript">
-function post_new_complaint(){
-    if ($('#new_complaint_description').val().trim()!='' && $('#new_complaint_title').val().trim()!=''){
-        $.ajax({
-            url:"/first/complaint/new.json?title="+$('#new_complaint_title').val()+"&description="+$('#new_complaint_description').val(),
-			success:function(data){
-                location.href=location.href;
-			},
-			error:function(){
-                alert("Couldn't post new complaint.");
-			}
-		});
-	}
-}
+
+    function post_new_complaint(){
+
+        var e = document.getElementById("complaint_dept");
+        var dept = e.options[e.selectedIndex].value;
+
+        if ($('#new_complaint_description').val().trim()!='' && $('#new_complaint_title').val().trim()!=''){
+            $.ajax({
+                url:"/first/complaint/new.json?title="+$('#new_complaint_title').val()+"&description="+$('#new_complaint_description').val()+"&level="+$('input[name=complaint_level]:checked').val()+"&complaint_dept="+dept,
+                success:function(data){
+                    location.href=location.href;
+                },
+                error:function(){
+                    alert("Couldn't post new complaint.");
+                }
+            });
+        }
+    }
+
+    function filter_complaints(){
+        var e = document.getElementById("display_dept");
+        var dept = e.options[e.selectedIndex].value;
+        window.location.href = "/first/default/home?level="+$('input[name=display_complaint_level]:checked').val()+"&display_dept="+dept;
+    }
+
+    function upvote(comp_id){
+        $.ajax({url:"/first/complaint/upvote?type=1&complaint_id="+comp_id,
+                success: location.href=location.href,
+                error: function(){alert("failed to vote");}
+               });
+    }
+
+    function downvote(comp_id){
+        $.ajax({url:"/first/complaint/upvote?type=-1&complaint_id="+comp_id,
+                success: location.href=location.href,
+                error: function(){alert("failed to vote");}
+               });
+    }
 </script>
 
 {{def name_of(user_id):}}
@@ -28,11 +67,39 @@ function post_new_complaint(){
     {{return name;}}
 {{pass}}
 {{pass}}
+<hr>
+<hr>
 
+<div id="filters_div" style="width:1000px;margin-bottom:5px;">
+    Filter By:
+    <form id="display_comp_level">
+        <input type="radio" id="display_complaint_level" name="display_complaint_level" value="0" checked> All
+        <input type="radio" id="display_complaint_level" name="display_complaint_level" value="1"> Individual Level
+        <input type="radio" id="display_complaint_level" name="display_complaint_level" value="2"> Hostel Level
+        <input type="radio" id="display_complaint_level" name="display_complaint_level" value="3"> Institute Level
+    </form>
+    {{if (auth.user.type_==2):}}<button class="admin_button" id="admin_button"> Admin mode </button>
+    {{else:}}
+    {{pass}}
+    <select id="display_dept">
+        <option value="0" selected="selected"> All</option>
+        <option value="1">General</option>
+        <option value="2">Maintenance</option>
+        <option value="3">Mess</option>
+        <option value="4">Sports</option>
+        <option value="5">Cultural</option>
+    </select>
+    <button class="gen_button" onclick="filter_complaints();" tabindex="3"> Apply </button>
+</div>
+
+<hr>
 {{for complaint in my_hostel_complaints:}}
-<div style="background: #f0f0f0; margin-bottom: 5px; padding: 8px;">
-<h3><a href="{{=URL('spec_complaint',args=[complaint.id])}}"> {{=name_of(complaint.user_id)}} on {{=complaint.created_at}}: </a> </h3>
-{{=MARKMIN(complaint.description)}}
+<div id="complaint_div" style="background: #f0f0f0; padding = 10px; margin-bottom: 5px;">
+    <h3><a href="{{=URL('spec_complaint',args=[complaint.id])}}"> {{=complaint.title}}</a> </h3>
+    <button class="updownvote" id="upvote" onclick="upvote('{{=str(complaint.id)}}');"> +1 </button>
+    <p class="updownvote" id="vote_counter"> {{=upvote_count(complaint.id) }} </p> <!--=URL('upvote_count',vars=dict(complaint_id=str(complaint.id)))-->
+    <button class="updownvote" id="downvote" onclick="downvote('{{=str(complaint.id)}}');"> -1 </button>
+    {{=name_of(complaint.user_id)}} on {{=complaint.created_at}}
 </div>
 
 {{pass}}
