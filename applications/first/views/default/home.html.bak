@@ -1,5 +1,5 @@
 {{extend 'layout.html'}}
-
+<h3><a href='/first/default/notification.html'>Notifications</a></h3>
 <div class="create_complaint" style="background: #f0f0f0; padding: 10px;">
     <h4>Create Complaint:</h4>
     <input class="form-control" id="new_complaint_title" type="text" placeholder="Title" tabindex="1">

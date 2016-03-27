@@ -1,11 +1,4 @@
 {{extend 'layout.html'}}
-{{def name_of(user_id):}}
-    {{row = db(db.users.id == user_id).select().first();}}
-    {{name = row.first_name}}
-    {{if row.last_name: name = name +" "+row.last_name}}
-    {{return name;}}
-{{pass}}
-{{pass}}
 <div class="table-responsive">
 	{{if len(notifications)>0:}}
 		<table class="table table-striped">
@@ -13,7 +6,6 @@
 				<tr>
 					<td>S.no.</td>
 					<td>Notification</td>
-                    <td>Created By</td>
 					<td>Time</td>
 				</tr>
 			</thead>
@@ -22,7 +14,6 @@
 				<tr style="{{='background:lightblue' if noti.is_seen==0 else ''}}">
 					<td>{{=i+1}}</td>
 					<td>{{=XML(noti.description)}}</td>
-                    <td>{{=name_of(noti.user_id)}} </td>
 					<td>{{=noti.created_at}}</td>
 				</tr>
 			{{pass}}

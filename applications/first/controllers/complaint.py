@@ -12,7 +12,19 @@ def new():
         level = str(request.vars["level"]).strip()
         dept = str(request.vars["complaint_dept"]).strip()
         if description!='':
-            cid = db.complaint.insert(user_id=auth.user.id, description=description, title=title, type_=level, department=dept);
+            cid = db.complaint.insert(user_id=auth.user.id, description=description, title=title, type_=level, department=dept)
+            userId = auth.user.id
+            hostelName = db(db.users.id==userId).select().first().hostel_name
+            if level == "1":
+                users = db((db.users.type_==2)&(db.users.hostel_name == hostelName)).select()
+            elif level == "2":
+                users = getHostelMates(hostelName)
+            else:
+                users = db(db.users.username!=None).select()
+            for user in users:
+                if user!=auth.user.id:
+                    u = auth.user
+                    db.notifications.insert(user_id=user, description="new <a href='/first/default/spec_complaint/%s'>complaint</a> posted by %s"%(cid,(u.first_name+" "+u.last_name).title()))
         return dict(success=True, complaint_id=cid)
     return dict(success=False)
 

@@ -28,6 +28,24 @@ def second():
     a = request.vars.visitor_name
     return dict(message=a)
 
+@request.restful()
+def api():
+    response.view = 'generic.'+request.extension
+    def GET(*args,**vars):
+        patterns = 'auto'
+        parser = db.parse_as_rest(patterns,args,vars)
+        if parser.status == 200:
+            return dict(content=parser.response)
+        else:
+            raise HTTP(parser.status,parser.error)
+    def POST(table_name,**vars):
+        return db[table_name].validate_and_insert(**vars)
+    def PUT(table_name,record_id,**vars):
+        return db(db[table_name]._id==record_id).update(**vars)
+    def DELETE(table_name,record_id):
+        return db(db[table_name]._id==record_id).delete()
+    return dict(GET=GET, POST=POST, PUT=PUT, DELETE=DELETE)
+
 @auth.requires_login()
 def complaint():
     form = crud.create(db.complaint)
@@ -143,9 +161,17 @@ def post_comment():
     description = str(request.vars["description"]).strip()
     comment_id = db.comments.insert(complaint_id=complaint_id, user_id=auth.user.id, description=description)
     hostelName = db(db.users.id==auth.user.id).select().first().hostel_name
-    users = getHostelMates(hostelName)
+    type1 = db(db.complaint.id==complaint_id).select().first().type_
+    if type1 == 1:
+        users = db((db.users.type_==2)&(db.users.hostel_name == hostelName)).select()
+    elif type1 == 2:
+        users = getHostelMates(hostelName)
+    else:
+        users = db(db.users.username!=None).select()
     for user in users:
-        db.notifications.insert(user_id=user, description="new <a href='/first/default/spec_complaint/%s'>comment</a> posted"%(complaint_id))
+        if user!=auth.user.id:
+            u = auth.user
+            db.notifications.insert(user_id=user, description="new <a href='/first/default/spec_complaint/%s'>comment</a> posted by %s"%(complaint_id,(u.first_name+" "+u.last_name).title()))
     return dict(success=True,comments_id=comment_id)
 
 def getHostelMates(hostel_name):
