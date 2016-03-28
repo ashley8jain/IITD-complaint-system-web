@@ -152,14 +152,15 @@ def spec_complaint():
         raise HTTP(404)
     else:
         complaint = complaint.first()
-        comments = db(db.comments.complaint_id == complaint.id).select();
+        comments = db(db.comments.complaint_id == complaint.id).select(orderby=~db.comments.created_at);
     return locals();
 
 @auth.requires_login()
 def post_comment():
     complaint_id = int(request.vars["complaint_id"])
     description = str(request.vars["description"]).strip()
-    comment_id = db.comments.insert(complaint_id=complaint_id, user_id=auth.user.id, description=description)
+    userName = str(auth.user.first_name) + " " + str(auth.user.last_name);
+    comment_id = db.comments.insert(complaint_id=complaint_id, user_id=auth.user.id, description=description, user_name=userName)
     hostelName = db(db.users.id==auth.user.id).select().first().hostel_name
     type1 = db(db.complaint.id==complaint_id).select().first().type_
     if type1 == 1:

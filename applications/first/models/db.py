@@ -153,6 +153,7 @@ db.define_table(
     Field('user_id',db.users),
     Field('description','string'),
     Field('created_at','datetime', default=datetime.now),
+    Field('user_name','string'),
 )
 
 db.define_table(

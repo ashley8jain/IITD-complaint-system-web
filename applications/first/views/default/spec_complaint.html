@@ -51,9 +51,9 @@
 <div style="width:600px;background:#f0f0f0;margin-bottom: 5px;padding:10px;">
     {{comment_id = comment.id}}
     {{posted_user = comment.user_id}}
-    {{user = db(db.users.id==comment.user_id).select().first()}}
+    {{userName = comment.user_name}}
     <div class="comment_side">
-        <h4 style="width:450px;"> {{=(user.first_name +" "+ user.last_name)}}</h4>
+        <h4 style="width:450px;"> {{=(userName)}}</h4>
         <p style="width:450px;">{{=(comment.description)}} </p>
     </div>
     {{if (posted_user==auth.user.id):}}<div class="comment_side"><button type="submit" onclick="delete_comment({{=comment.id}})" style="width:70px; height:40px;float:right">Delete</button> </div>
