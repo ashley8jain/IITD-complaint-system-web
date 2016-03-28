@@ -47,14 +47,14 @@
 
     function upvote(comp_id){
         $.ajax({url:"/first/complaint/upvote?type=1&complaint_id="+comp_id,
-                success: location.href=location.href,
+                success: function(){window.location.href = "/first/default/home";},
                 error: function(){alert("failed to vote");}
                });
     }
 
     function downvote(comp_id){
         $.ajax({url:"/first/complaint/upvote?type=-1&complaint_id="+comp_id,
-                success: location.href=location.href,
+                success: function(){window.location.href = "/first/default/home";},
                 error: function(){alert("failed to vote");}
                });
     }

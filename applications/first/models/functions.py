@@ -17,4 +17,5 @@ def upvote_count(comp_id):
         return 0;
     else:
         sum_of_votes = int(votes);
+        db(db.complaint.id==comp_id).update(no_of_votes=sum_of_votes);
         return sum_of_votes;

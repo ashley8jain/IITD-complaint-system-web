@@ -151,8 +151,10 @@ def spec_complaint():
     if len(complaint)<1:
         raise HTTP(404)
     else:
+        user = db(db.users.id==complaint.user_id).select().first();
+        complaint_user_name = str(user.first_name)+" "+str(user.last_name)
         complaint = complaint.first()
-        comments = db(db.comments.complaint_id == complaint.id).select();
+        comments = db(db.comments.complaint_id == complaint.id).select(orderby=~db.comments.created_at);
     return locals();
 
 @auth.requires_login()
