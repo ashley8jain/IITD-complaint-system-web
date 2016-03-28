@@ -147,13 +147,12 @@ def spec_complaint():
         aid = request.args[0]
     except Exception, e:
         raise HTTP(404)
-    complaint = db(db.complaint.id==aid).select()
-    if len(complaint)<1:
+    complaint = db(db.complaint.id==aid).select().first()
+    if len(complaint.id)<1:
         raise HTTP(404)
     else:
         user = db(db.users.id==complaint.user_id).select().first();
-        complaint_user_name = str(user.first_name)+" "+str(user.last_name)
-        complaint = complaint.first()
+        complaint_user_name = str(user.first_name)+" "+str(user.last_name);
         comments = db(db.comments.complaint_id == complaint.id).select(orderby=~db.comments.created_at);
     return locals();
 
