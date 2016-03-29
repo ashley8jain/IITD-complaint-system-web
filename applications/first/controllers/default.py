@@ -91,6 +91,21 @@ def login():
 def logout():
     return dict(success=True, loggedout=auth.logout())
 
+def register():
+    first_name = request.vars.first_name
+    last_name = request.vars.last_name
+    username = request.vars.username
+    hostel_name = request.vars.hostel_name
+    department = request.vars.department
+    type_ = request.vars.type_
+    password = request.vars.password
+    row = db.users(username=username)
+    if not row:
+        db.users.insert(first_name=first_name,last_name=last_name,username=username,hostel_name=hostel_name,department=department,type_=type_,password=password)
+    else:
+        return dict(success=False,message="Username exists")
+    return dict(success=True,message="Registered")
+
 
 def call():
     """
