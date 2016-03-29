@@ -43,13 +43,16 @@ def upvote():
         initial = initial.upvote;
         if (initial==vote):
             vid = db((db.votes.user_id==auth.user.id)&(db.votes.complaint_id==comp_id)).update(upvote=0);
-            return dict(success=True, vote_id=vid,create = "updated");
+            noOfVotes = upvote_count(comp_id)
+            return dict(success=True, vote_id=vid,create = "upvoted", no_of_votes = noOfVotes);
         else:
             vid = db((db.votes.user_id==auth.user.id)&(db.votes.complaint_id==comp_id)).update(upvote=vote);
-            return dict(success=True, vote_id=vid,create = "updated");
+            noOfVotes = upvote_count(comp_id)
+            return dict(success=True, vote_id=vid,create = "downvoted", no_of_votes = noOfVotes);
     else:
         vid = db.votes.insert(user_id=auth.user.id, complaint_id=comp_id, upvote=vote);
-        return dict(success=True, vote_id=vid,create = "created");
+        noOfVotes = upvote_count(comp_id);
+        return dict(success=True, vote_id=vid ,create = "created",no_of_votes=noOfVotes);
 
 @auth.requires_login()
 def edit_complaint():
